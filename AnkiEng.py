@@ -46,7 +46,7 @@ def add_card(deck_name, word, ipa,audio_path,definitions,tipo):
 
     result = invoke("addNote", {"note": note})
     if result.get("error") is None:
-        print("Tarjeta añadida exitosamente.")
+        print(f"Tarjeta {word} creada correctamente")
     else:
         print(f"Error al añadir la tarjeta: {result['error']}")
 
@@ -72,12 +72,12 @@ url = "https://api.dictionaryapi.dev/api/v2/entries/en/"
 
 def extraerData(frase):
   
-
+  print(f"Buscando {frase} en el diccionario...")
   url_final=url+urllib.parse.quote(frase)
   solicitud=requests.get(url_final)
-
+  
   if solicitud.status_code==200:
-    print("Solicitud exitosa")
+    print(f"{frase} localizada")
     json=solicitud.json()[0]
     tarjeta={}
 
@@ -106,15 +106,15 @@ def extraerData(frase):
 
       except:
         tarjeta.update({"category":{"":{"definition":"","example":""}}})
-    
+    print("Datos extraidos...")
     tts = gTTS(text=frase, lang='en')
     path="C:/Users/adria/AppData/Roaming/Anki2/Usuario 1/collection.media/"
     audio_file = path+frase.replace(" ", "_") + ".mp3"
     tts.save(audio_file)
-
+    print(f"Audio guardado en {audio_file}")
     # Reproducir el audio (opcional)
     #os.system(f"start {audio_file}")
-    tarjeta.update({"audio":audio_file})
+    tarjeta.update({"audio":frase.replace(" ", "_") + ".mp3"})
 
     crearTarjeta(tarjeta)
 
@@ -130,7 +130,9 @@ while(1):
     if dato.upper()=="P":
         break
     try:
-        extraerData(dato)
+        busca=dato.split(",")
+        for n in busca:
+          extraerData(n)
         time.sleep(1)
     except:
         print("Error intenta de nuevo")
